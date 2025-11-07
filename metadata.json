@@ -1,0 +1,5 @@
+{
+  "name": "Gerador de Gatilhos Mentais para Copywriting",
+  "description": "Uma aplicação web que utiliza a API do Gemini para gerar exemplos de copywriting persuasivo com base em gatilhos mentais selecionados, ajudando usuários a criar textos de vendas mais eficazes.",
+  "requestFramePermissions": []
+}
