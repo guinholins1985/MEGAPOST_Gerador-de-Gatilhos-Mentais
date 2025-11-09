@@ -1,16 +1,15 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import type { CopywritingResult } from '../types';
 
-// Ensure this environment variable is set in your deployment environment
-const API_KEY = process.env.API_KEY;
-
-if (!API_KEY) {
-  // In a real app, you might want to handle this more gracefully.
-  // For this context, we assume the key is available.
-  console.warn("API_KEY environment variable not set. API calls will fail.");
+// Helper function to get the AI instance and check for API key
+function getAiInstance() {
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    // This provides a much clearer error for Vercel/deployment scenarios.
+    throw new Error("A chave da API do Gemini (API_KEY) não está configurada. Adicione-a como uma variável de ambiente nas configurações do seu projeto.");
+  }
+  return new GoogleGenAI({ apiKey });
 }
-
-const ai = new GoogleGenAI({ apiKey: API_KEY! });
 
 const responseSchema = {
   type: Type.ARRAY,
@@ -51,6 +50,7 @@ export const generateProductName = async (adImage: string): Promise<string> => {
   ];
 
   try {
+    const ai = getAiInstance(); // Get instance here
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: { parts },
@@ -69,6 +69,9 @@ export const generateProductName = async (adImage: string): Promise<string> => {
     
   } catch (error) {
     console.error("Error calling Gemini API for product name generation:", error);
+    if (error instanceof Error) {
+        throw new Error(`Falha ao gerar o nome do produto: ${error.message}`);
+    }
     throw new Error("Falha ao gerar o nome do produto. Verifique o console para mais detalhes.");
   }
 };
@@ -109,6 +112,7 @@ export const generateCopy = async (
   }
 
   try {
+    const ai = getAiInstance(); // Get instance here
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash", // This model supports multimodal input
       contents: { parts },
@@ -132,6 +136,9 @@ export const generateCopy = async (
     return parsedResult;
   } catch (error) {
     console.error("Error calling Gemini API:", error);
+    if (error instanceof Error) {
+        throw new Error(`Falha ao comunicar com a API do Gemini: ${error.message}`);
+    }
     throw new Error("Falha ao comunicar com a API do Gemini. Verifique o console para mais detalhes.");
   }
 };
