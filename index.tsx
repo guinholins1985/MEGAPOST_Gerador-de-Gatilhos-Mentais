@@ -36,7 +36,8 @@ const mentalTriggers: MentalTrigger[] = [
 // GEMINI API SERVICE
 //======================================================================
 function getAiInstance() {
-  const apiKey = process.env.API_KEY;
+  // FIX: Safely access API key to prevent browser crash (ReferenceError: process is not defined)
+  const apiKey = typeof process !== 'undefined' && process.env ? process.env.API_KEY : undefined;
   if (!apiKey) {
     throw new Error("A chave da API do Gemini (API_KEY) não está configurada. Adicione-a como uma variável de ambiente nas configurações do seu projeto.");
   }
@@ -393,7 +394,9 @@ const App = () => {
   const [apiKeyMissing, setApiKeyMissing] = useState(false);
 
   useEffect(() => {
-    if (!process.env.API_KEY) {
+    // FIX: Safely check for API key to prevent browser crash (ReferenceError: process is not defined)
+    const apiKey = typeof process !== 'undefined' && process.env ? process.env.API_KEY : undefined;
+    if (!apiKey) {
       setApiKeyMissing(true);
     }
   }, []);
